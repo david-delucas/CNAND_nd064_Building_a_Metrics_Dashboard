@@ -1,0 +1,105 @@
+# Generated with kubectl describe node localhost
+
+Name:               localhost
+Roles:              master
+Labels:             beta.kubernetes.io/arch=amd64
+                    beta.kubernetes.io/instance-type=k3s
+                    beta.kubernetes.io/os=linux
+                    k3s.io/hostname=localhost
+                    k3s.io/internal-ip=10.0.2.15
+                    kubernetes.io/arch=amd64
+                    kubernetes.io/hostname=localhost
+                    kubernetes.io/os=linux
+                    node-role.kubernetes.io/master=true
+                    node.kubernetes.io/instance-type=k3s
+Annotations:        flannel.alpha.coreos.com/backend-data: {"VtepMAC":"ea:36:aa:37:ad:0b"}
+                    flannel.alpha.coreos.com/backend-type: vxlan
+                    flannel.alpha.coreos.com/kube-subnet-manager: true
+                    flannel.alpha.coreos.com/public-ip: 10.0.2.15
+                    k3s.io/node-args: ["server"]
+                    k3s.io/node-config-hash: 24VCQ42HQERKARRJMQ2IFIHPXSSOAEK5WXK2QECS3AWGCSCUBNGA====
+                    k3s.io/node-env: {"K3S_DATA_DIR":"/var/lib/rancher/k3s/data/688c8ca42a6cd0c042322efea271d6f3849d3de17c850739b0da2461f6c69ee8"}
+                    node.alpha.kubernetes.io/ttl: 0
+                    volumes.kubernetes.io/controller-managed-attach-detach: true
+CreationTimestamp:  Fri, 09 Oct 2020 20:21:09 +0200
+Taints:             <none>
+Unschedulable:      false
+Lease:
+  HolderIdentity:  localhost
+  AcquireTime:     <unset>
+  RenewTime:       Tue, 13 Oct 2020 11:41:20 +0200
+Conditions:
+  Type                 Status  LastHeartbeatTime                 LastTransitionTime                Reason                       Message
+  ----                 ------  -----------------                 ------------------                ------                       -------
+  NetworkUnavailable   False   Tue, 13 Oct 2020 09:39:43 +0200   Tue, 13 Oct 2020 09:39:43 +0200   FlannelIsUp                  Flannel is running on this node
+  MemoryPressure       False   Tue, 13 Oct 2020 11:41:24 +0200   Mon, 12 Oct 2020 16:52:20 +0200   KubeletHasSufficientMemory   kubelet has sufficient memory available
+  DiskPressure         False   Tue, 13 Oct 2020 11:41:24 +0200   Mon, 12 Oct 2020 16:52:20 +0200   KubeletHasNoDiskPressure     kubelet has no disk pressure
+  PIDPressure          False   Tue, 13 Oct 2020 11:41:24 +0200   Mon, 12 Oct 2020 16:52:20 +0200   KubeletHasSufficientPID      kubelet has sufficient PID available
+  Ready                True    Tue, 13 Oct 2020 11:41:24 +0200   Tue, 13 Oct 2020 09:39:50 +0200   KubeletReady                 kubelet is posting ready status
+Addresses:
+  InternalIP:  10.0.2.15
+  Hostname:    localhost
+Capacity:
+  cpu:                1
+  ephemeral-storage:  43085872Ki
+  hugepages-2Mi:      0
+  memory:             8145408Ki
+  pods:               110
+Allocatable:
+  cpu:                1
+  ephemeral-storage:  41913936249
+  hugepages-2Mi:      0
+  memory:             8145408Ki
+  pods:               110
+System Info:
+  Machine ID:                 ba3bcae810de4913b521ac3d1999a21f
+  System UUID:                feb52a80-e540-e941-8d4e-e72e3d1c146a
+  Boot ID:                    87107f13-a0a7-4248-8b9f-11246265f586
+  Kernel Version:             5.3.18-lp152.44-default
+  OS Image:                   openSUSE Leap 15.2
+  Operating System:           linux
+  Architecture:               amd64
+  Container Runtime Version:  containerd://1.3.3-k3s2
+  Kubelet Version:            v1.18.9+k3s1
+  Kube-Proxy Version:         v1.18.9+k3s1
+PodCIDR:                      10.42.0.0/24
+PodCIDRs:                     10.42.0.0/24
+ProviderID:                   k3s://localhost
+Non-terminated Pods:          (26 in total)
+  Namespace                   Name                                                      CPU Requests  CPU Limits  Memory Requests  Memory Limits  AGE
+  ---------                   ----                                                      ------------  ----------  ---------------  -------------  ---
+  elastic-system              elastic-operator-0                                        100m (10%)    1 (100%)    150Mi (1%)       512Mi (6%)     3d14h
+  default                     frontend-d998d8c49-2k5rq                                  0 (0%)        0 (0%)      0 (0%)           0 (0%)         3d13h
+  monitoring                  prometheus-prometheus-oper-operator-5ff8fbd5fb-fczkz      0 (0%)        0 (0%)      0 (0%)           0 (0%)         3d14h
+  default                     svclb-hello-python-service-5wvlk                          0 (0%)        0 (0%)      0 (0%)           0 (0%)         3d13h
+  default                     frontend-d998d8c49-sgvlf                                  0 (0%)        0 (0%)      0 (0%)           0 (0%)         3d13h
+  default                     frontend-d998d8c49-nzvbp                                  0 (0%)        0 (0%)      0 (0%)           0 (0%)         3d13h
+  default                     hello-python-56566f55bc-8czdx                             0 (0%)        0 (0%)      0 (0%)           0 (0%)         3d13h
+  observability               jaeger-operator-7dc9bd7cf5-p6wh9                          0 (0%)        0 (0%)      0 (0%)           0 (0%)         3d14h
+  default                     hello-python-56566f55bc-6nk88                             0 (0%)        0 (0%)      0 (0%)           0 (0%)         3d13h
+  default                     hello-python-56566f55bc-h4x54                             0 (0%)        0 (0%)      0 (0%)           0 (0%)         3d13h
+  default                     hello-python-56566f55bc-r2gsr                             0 (0%)        0 (0%)      0 (0%)           0 (0%)         3d13h
+  kube-system                 metrics-server-7566d596c8-h64l2                           0 (0%)        0 (0%)      0 (0%)           0 (0%)         3d15h
+  istio-system                svclb-istio-ingressgateway-jpxgv                          0 (0%)        0 (0%)      0 (0%)           0 (0%)         3d13h
+  monitoring                  prometheus-kube-state-metrics-c65b87574-nnntr             0 (0%)        0 (0%)      0 (0%)           0 (0%)         3d14h
+  monitoring                  alertmanager-prometheus-prometheus-oper-alertmanager-0    100m (10%)    100m (10%)  225Mi (2%)       25Mi (0%)      3d14h
+  monitoring                  prometheus-grafana-5dbdf669c8-xh8xn                       0 (0%)        0 (0%)      0 (0%)           0 (0%)         3d14h
+  monitoring                  prometheus-prometheus-prometheus-oper-prometheus-0        200m (20%)    200m (20%)  50Mi (0%)        50Mi (0%)      3d14h
+  istio-system                istiod-75c5776d98-vsrtn                                   10m (1%)      0 (0%)      100Mi (1%)       0 (0%)         3d13h
+  istio-system                istio-egressgateway-669785ffb4-ptglb                      10m (1%)      2 (200%)    40Mi (0%)        1Gi (12%)      3d13h
+  monitoring                  prometheus-prometheus-node-exporter-gn989                 0 (0%)        0 (0%)      0 (0%)           0 (0%)         3d14h
+  istio-system                istio-ingressgateway-76447f8f85-5cxsg                     10m (1%)      2 (200%)    40Mi (0%)        1Gi (12%)      3d13h
+  observability               simplest-85d69f4b8-zs7wl                                  0 (0%)        0 (0%)      0 (0%)           0 (0%)         13h
+  kube-system                 local-path-provisioner-6d59f47c7-rzblb                    0 (0%)        0 (0%)      0 (0%)           0 (0%)         3d15h
+  kube-system                 coredns-7944c66d8d-k54ht                                  100m (10%)    0 (0%)      70Mi (0%)        170Mi (2%)     3d15h
+  default                     quickstart-es-default-0                                   100m (10%)    100m (10%)  2Gi (25%)        2Gi (25%)      3d14h
+  kube-system                 traefik-758cd5fc85-bdpnd                                  0 (0%)        0 (0%)      0 (0%)           0 (0%)         120m
+Allocated resources:
+  (Total limits may be over 100 percent, i.e., overcommitted.)
+  Resource           Requests      Limits
+  --------           --------      ------
+  cpu                630m (63%)    5400m (540%)
+  memory             2723Mi (34%)  4853Mi (61%)
+  ephemeral-storage  0 (0%)        0 (0%)
+  hugepages-2Mi      0 (0%)        0 (0%)
+Events:              <none>

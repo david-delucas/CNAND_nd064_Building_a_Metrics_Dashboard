@@ -1,0 +1,329 @@
+0. unsintall old versions of VBox:
+    cb@satyamz:~/containers/k8s-demo$ sudo apt-get remove --purge virtualbox* 
+    cb@satyamz:~/containers/k8s-demo$ sudo rm ~/"VirtualBox VMs" -Rf 
+    cb@satyamz:~/containers/k8s-demo$ sudo rm ~/.config/VirtualBox/ -Rf
+    This is to solve an error while executing `VBoxManage`, a CLI used by Vagrant
+1. install latest versions of virtualbox and vagrant:
+        sudo apt install ./virtualbox-6.1_6.1.14-140239_Ubuntu_eoan_amd64.deb 
+2. update 8Gb memory in the vagrant file.
+3. add user to vboxusers user group ubuntu (host OS):
+    sudo usermod -a -G vboxusers $USER
+4. vagrant up produce the following errors, not clear the reason nor the impact of these errors:
+
+    (base) david@hostOS:~/training/UDACITY/CNAND_nd064_Building_a_Metrics_Dashboard_Starter_Files$ vagrant up
+    Bringing machine 'default' up with 'virtualbox' provider...
+    ==> default: Checking if box 'opensuse/Leap-15.2.x86_64' version '15.2.31.194' is up to date...
+    ==> default: Clearing any previously set forwarded ports...
+    ==> default: Clearing any previously set network interfaces...
+    ==> default: Preparing network interfaces based on configuration...
+        default: Adapter 1: nat
+    ==> default: Forwarding ports...
+        default: 6443 (guest) => 9999 (host) (adapter 1)
+        default: 22 (guest) => 2222 (host) (adapter 1)
+    ==> default: Running 'pre-boot' VM customizations...
+    ==> default: Booting VM...
+    ==> default: Waiting for machine to boot. This may take a few minutes...
+        default: SSH address: 127.0.0.1:2222
+        default: SSH username: vagrant
+        default: SSH auth method: password
+        default: Warning: Connection reset. Retrying...
+        default: Warning: Remote connection disconnect. Retrying...
+        default: Warning: Connection reset. Retrying...
+    ==> default: Machine booted and ready!
+    [default] GuestAdditions seems to be installed (6.1.14) correctly, but not running.
+    service: no such service vboxadd
+    Warning: vboxadd-service.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+    bash: line 4: setup: command not found
+    ==> default: Checking for guest additions in VM...
+    The following SSH command responded with a non-zero exit status.
+    Vagrant assumes that this means the command failed!
+
+    setup
+
+    Stdout from the command:
+
+
+
+    Stderr from the command:
+
+    bash: line 4: setup: command not found
+
+
+5. install k3s in guest OS
+    curl -sfL https://get.k3s.io | sh -
+    k3s kubectl get node
+    from inside vagrant instance
+
+    Modify /etc/systemd/system/k3s.service so the k3s server is started with wirte permissions to the relevant file below:
+        /usr/local/bin/k3s server --write-kubeconfig-mode 644
+
+6. install helm in guest OS
+    curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+7.  sudo chmod 777 /etc/rancher/k3s/k3s.yaml
+    cp /etc/rancher/k3s/k3s.yaml .kube/config in guess OS
+
+8. kube context in local machine, set in in ~/.kube/config, besides a pre-existing minikube configuration
+        kubectl config view
+
+        (base) david@hostOS:~/training/UDACITY/CNAND_nd064_Building_a_Metrics_Dashboard_Starter_Files$ kubectl config view
+        apiVersion: v1
+        clusters:
+        - cluster:
+            insecure-skip-tls-verify: true
+            server: https://127.0.0.1:9999
+        name: default
+        - cluster:
+            certificate-authority: /home/david/.minikube/ca.crt
+            server: https://192.168.99.100:8443
+        name: minikube
+        contexts:
+        - context:
+            cluster: default
+            user: vagrant
+        name: default
+        - context:
+            cluster: minikube
+            user: minikube
+        name: minikube
+        current-context: minikube
+        kind: Config
+        preferences: {}
+        users:
+        - name: minikube
+        user:
+            client-certificate: /home/david/.minikube/profiles/minikube/client.crt
+            client-key: /home/david/.minikube/profiles/minikube/client.key
+        - name: vagrant
+        user:
+            client-certificate: /home/david/training/UDACITY/CNAND_nd064_Building_a_Metrics_Dashboard_Starter_Files/client-certificate
+            client-key: /home/david/training/UDACITY/CNAND_nd064_Building_a_Metrics_Dashboard_Starter_Files/client-key
+
+
+    Client cert and key are taken from the guess OS in order to be able to log in to the server:
+
+    use the following certs in guess OS:
+        /var/lib/rancher/k3s/server/tls
+
+        -rw------- 1 root root  227 Oct  9 20:20 client-admin.key
+        -rw-r--r-- 1 root root 1084 Oct  9 20:20 client-admin.crt
+
+    put this in the .kube/config file to access the k3s in the vagrant instance:
+
+        client-certificate: /home/david/training/UDACITY/CNAND_nd064_Building_a_Metrics_Dashboard_Starter_Files/client-admin.crt
+        client-key: /home/david/training/UDACITY/CNAND_nd064_Building_a_Metrics_Dashboard_Starter_Files/client-admin.key
+
+9. to avoid (base) david@localhost:~$ kubectl get node
+    Unable to connect to the server: x509: certificate signed by unknown authority
+   run: 
+    kubectl config set-cluster default --insecure-skip-tls-verify=true --server=default
+10. Activate k3s context in the host OS:
+    kubectl config use-context default
+
+11. Observe the pods and check helm:
+    Guest OS:
+        export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+        kubectl get pods --all-namespaces
+        helm ls --all-namespaces
+
+    Host OS:
+        kubectl config use-context default
+        kubectl get nodes
+
+        kubectl get pods --all-namespaces
+        helm ls --all-namespaces --kube-context default
+
+
+9.5 Installing prometheus operator, produce the following errors, not sure of they are relevant:
+
+
+    helm install prometheus stable/prometheus-operator --namespace monitoring
+    WARNING: This chart is deprecated
+    manifest_sorter.go:192: info: skipping unknown hook: "crd-install"
+    manifest_sorter.go:192: info: skipping unknown hook: "crd-install"
+    manifest_sorter.go:192: info: skipping unknown hook: "crd-install"
+    manifest_sorter.go:192: info: skipping unknown hook: "crd-install"
+    manifest_sorter.go:192: info: skipping unknown hook: "crd-install"
+    manifest_sorter.go:192: info: skipping unknown hook: "crd-install"
+    NAME: prometheus
+    LAST DEPLOYED: Thu Oct 15 14:33:23 2020
+    NAMESPACE: monitoring
+    STATUS: deployed
+    REVISION: 1
+    NOTES:
+    *******************
+    *** DEPRECATED ****
+    *******************
+    * stable/prometheus-operator chart is deprecated.
+    * Further development has moved to https://github.com/prometheus-community/helm-charts
+    * The chart has been renamed kube-prometheus-stack to more clearly reflect
+    * that it installs the `kube-prometheus` project stack, within which Prometheus
+    * Operator is only one component.
+
+    The Prometheus Operator has been installed. Check its status by running:
+    kubectl --namespace monitoring get pods -l "release=prometheus"
+
+    Visit https://github.com/coreos/prometheus-operator for instructions on how
+    to create & configure Alertmanager and Prometheus instances using the Operator.
+
+
+9.6 Install elasticsearch:
+
+    kubectl apply -f https://download.elastic.co/downloads/eck/1.2.1/all-in-one.yaml
+    kubectl apply -f manifests/other/elasticsearch.yaml
+    PASSWORD=$(kubectl get secret quickstart-es-elastic-user -o=jsonpath='{.data.elastic}' | base64 --decode)
+    kubectl create secret generic jaeger-secret --from-literal=ES_PASSWORD=${PASSWORD} --from-literal=ES_USERNAME=elastic
+
+9.7 install jaeger:
+
+    kubectl create namespace observability
+    kubectl create -f https://raw.githubusercontent.com/jaegertracing/jaeger-operator/master/deploy/crds/jaegertracing.io_jaegers_crd.yaml
+    kubectl create -n observability -f https://raw.githubusercontent.com/jaegertracing/jaeger-operator/master/deploy/service_account.yaml
+    kubectl create -n observability -f https://raw.githubusercontent.com/jaegertracing/jaeger-operator/master/deploy/role.yaml
+    kubectl create -n observability -f https://raw.githubusercontent.com/jaegertracing/jaeger-operator/master/deploy/role_binding.yaml
+    kubectl create -n observability -f https://raw.githubusercontent.com/jaegertracing/jaeger-operator/master/deploy/operator.yaml
+
+    kubectl create -f https://raw.githubusercontent.com/jaegertracing/jaeger-operator/master/deploy/cluster_role.yaml
+    kubectl create -f https://raw.githubusercontent.com/jaegertracing/jaeger-operator/master/deploy/cluster_role_binding.yaml
+
+    kubectl apply -f manifests/other/jaeger-elasticsearch.yaml
+
+10. Then do the istioctl install is Host OS:
+        curl -L https://istio.io/downloadIstio | sh -
+
+        (base) david@localhost:~$ istioctl x precheck
+
+        Checking the cluster to make sure it is ready for Istio installation...
+
+        #1. Kubernetes-api
+        -----------------------
+        Can initialize the Kubernetes client.
+        Can query the Kubernetes API Server.
+
+        #2. Kubernetes-version
+        -----------------------
+        Istio is compatible with Kubernetes: v1.18.9+k3s1.
+
+        #3. Istio-existence
+        -----------------------
+        Istio will be installed in the istio-system namespace.
+
+        #4. Kubernetes-setup
+        -----------------------
+        Can create necessary Kubernetes configurations: Namespace,ClusterRole,ClusterRoleBinding,CustomResourceDefinition,Role,ServiceAccount,Service,Deployments,ConfigMap. 
+
+        #5. SideCar-Injector
+        -----------------------
+        This Kubernetes cluster supports automatic sidecar injection. To enable automatic sidecar injection see https://istio.io/docs/setup/kubernetes/additional-setup/sidecar-injection/#deploying-an-app
+
+        -----------------------
+        Install Pre-Check passed! The cluster is ready for Istio installation.
+
+        istioctl install --set profile=demo
+
+        kubectl label namespace default istio-injection=enabled
+
+        https://istio.io/latest/docs/setup/getting-started/
+
+11. Now do the port forwarding for the different components:
+
+        kubectl get pod -n monitoring| grep grafana
+
+        kubectl port-forward -n monitoring prometheus-grafana-5dbdf669c8-xh8xn 3000
+
+        kubectl get pod -n default| grep frontend
+
+        kubectl port-forward -n default frontend-d998d8c49-nzvbp 8080
+
+
+        kubectl get pod -n monitoring| grep prometheus
+
+        kubectl port-forward -n monitoring prometheus-prometheus-oper-operator-5ff8fbd5fb-fczkz 9090
+
+12. As a side note we observe many errors in syslog relate to k3s in the guess OS:
+
+    When running with systemd, logs will be created in /var/log/syslog and viewed using:
+     sudo journalctl -u k3s
+     sudo journalctl --since 14:00
+
+        ...
+        Oct 18 14:00:10 localhost k3s[1003]: E1018 14:00:10.968914    1003 horizontal.go:227] failed to compute desired number of replicas based on listed metrics for Deployment/observability/simple-pro>
+        Oct 18 14:00:11 localhost k3s[1003]: E1018 14:00:11.045068    1003 pod_workers.go:191] Error syncing pod 772fd89e-a76f-4cbc-bbe4-020d0db45aa9 ("trial-app-7876b5f6d7-gzhkt_default(772fd89e-a76f-4>
+        Oct 18 14:00:13 localhost k3s[1003]: E1018 14:00:13.048685    1003 pod_workers.go:191] Error syncing pod 8195b303-091b-4644-8856-3d1ee7a75374 ("backend-app-6779f6fbc-j9p45_default(8195b303-091b->
+        Oct 18 14:00:13 localhost k3s[1003]: E1018 14:00:13.050116    1003 pod_workers.go:191] Error syncing pod 146f6e38-5bed-4131-b787-333a3a1a27a4 ("trial-app-7876b5f6d7-c9rhg_default(146f6e38-5bed-4>
+        Oct 18 14:00:14 localhost k3s[1003]: E1018 14:00:14.089980    1003 pod_workers.go:191] Error syncing pod 0dc2f826-515e-4491-9768-94bb431e49b8 ("backend-app-6779f6fbc-gxrm5_default(0dc2f826-515e->
+        Oct 18 14:00:16 localhost k3s[1003]: E1018 14:00:16.117041    1003 kuberuntime_manager.go:807] container start failed: CreateContainerConfigError: secret "jaeger-secret" not found
+        Oct 18 14:00:16 localhost k3s[1003]: E1018 14:00:16.122555    1003 pod_workers.go:191] Error syncing pod 1f8a7389-f66c-4a1f-8e74-43df18eda48f ("simple-prod-es-index-cleaner-1602971700-wsfpq_obse>
+        Oct 18 14:00:17 localhost k3s[1003]: E1018 14:00:17.043880    1003 pod_workers.go:191] Error syncing pod 5f8152b6-ae51-4d4e-a0bc-9df056e51b82 ("trial-app-7876b5f6d7-v84dv_observability(5f8152b6->
+        Oct 18 14:00:18 localhost k3s[1003]: I1018 14:00:18.493069    1003 request.go:621] Throttling request took 1.033814733s, request: GET:https://127.0.0.1:6444/apis/beat.k8s.elastic.co/v1beta1?time>
+        Oct 18 14:00:19 localhost k3s[1003]: E1018 14:00:19.045582    1003 pod_workers.go:191] Error syncing pod c04dc00d-c599-4134-8817-0384ef75f6c1 ("trial-app-7876b5f6d7-5w8rw_default(c04dc00d-c599-4>
+        Oct 18 14:00:20 localhost k3s[1003]: E1018 14:00:20.061030    1003 kuberuntime_manager.go:807] container start failed: CreateContainerConfigError: secret "jaeger-secret" not found
+        Oct 18 14:00:20 localhost k3s[1003]: E1018 14:00:20.062463    1003 pod_workers.go:191] Error syncing pod 03b7c122-063e-46d7-839b-dc1e840b506e ("simple-prod-query-6c845c699f-swb5t_observability(0>
+        Oct 18 14:00:20 localhost k3s[1003]: E1018 14:00:20.062782    1003 pod_workers.go:191] Error syncing pod 2ea956df-6c25-4a55-a780-939738305a16 ("trial-app-7876b5f6d7-mvj4m_observability(2ea956df->
+        Oct 18 14:00:20 localhost k3s[1003]: E1018 14:00:20.065107    1003 pod_workers.go:191] Error syncing pod 9ea4a8bc-a612-4ef8-ae8b-26953d991a3f ("backend-app-6779f6fbc-s56ff_default(9ea4a8bc-a612->
+        Oct 18 14:00:22 localhost k3s[1003]: E1018 14:00:22.062161    1003 pod_workers.go:191] Error syncing pod 0de502b1-f647-4bad-a7f3-f2b130139e50 ("trial-app-7876b5f6d7-42ngd_observability(0de502b1->
+        Oct 18 14:00:24 localhost k3s[1003]: E1018 14:00:24.053912    1003 kuberuntime_manager.go:807] container start failed: CreateContainerConfigError: secret "jaeger-secret" not found
+        Oct 18 14:00:24 localhost k3s[1003]: E1018 14:00:24.054454    1003 pod_workers.go:191] Error syncing pod 2efd86c4-efde-4dac-87e5-47e16710e500 ("simple-prod-collector-bf69cf755-n2ngq_observabilit>
+        Oct 18 14:00:25 localhost k3s[1003]: E1018 14:00:25.046303    1003 pod_workers.go:191] Error syncing pod 8195b303-091b-4644-8856-3d1ee7a75374 ("backend-app-6779f6fbc-j9p45_default(8195b303-091b->
+        Oct 18 14:00:25 localhost k3s[1003]: E1018 14:00:25.048339    1003 pod_workers.go:191] Error syncing pod 772fd89e-a76f-4cbc-bbe4-020d0db45aa9 ("trial-app-7876b5f6d7-gzhkt_default(772fd89e-a76f-4>
+        Oct 18 14:00:27 localhost k3s[1003]: I1018 14:00:27.129087    1003 event.go:278] Event(v1.ObjectReference{Kind:"HorizontalPodAutoscaler", Namespace:"observability", Name:"simple-prod-collector",>
+        Oct 18 14:00:27 localhost k3s[1003]: E1018 14:00:27.155425    1003 horizontal.go:227] failed to compute desired number of replicas based on listed metrics for Deployment/observability/simple-pro>
+        Oct 18 14:00:27 localhost k3s[1003]: I1018 14:00:27.162498    1003 event.go:278] Event(v1.ObjectReference{Kind:"HorizontalPodAutoscaler", Namespace:"observability", Name:"simple-prod-collector"
+        ...
+    There are some relevant issues with the configuration of the "jaeger-secret" that I couldn't resolve ..yet
+
+
+13. Deploy the jaeger app with (similarly to what we did with the app, kubectl apply -f app/):
+
+    kubectl apply -f other/
+
+    kubectl get pods --all-namespaces | grep jaeger
+
+        observability    jaeger-operator-7dc9bd7cf5-p6wh9                         1/1     Running   5          3d11h
+
+    Here we can see the following ports:
+        https://raw.githubusercontent.com/jaegertracing/jaeger-operator/master/deploy/operator.yaml    
+
+           - containerPort: 8383
+          name: http-metrics
+        - containerPort: 8686
+          name: cr-metrics
+
+    kubectl get pod jaeger-operator-7dc9bd7cf5-p6wh9 -n observability -o yaml
+
+    kubectl port-forward -n observability jaeger-operator-7dc9bd7cf5-p6wh9 8383
+
+14. Unable to get access to Jaegger UI from the Host OS:
+
+    REMOTE ACCESS TO JAEGER UI SIMILAR ISSUE:
+        https://github.com/jaegertracing/jaeger-operator/issues/700
+        https://github.com/istio/istio/issues/12593
+        https://preliminary.istio.io/latest/docs/tasks/observability/gateways/
+
+    Tried with:
+        kubectl -n observability port-forward service/simple-prod-query 16686
+
+        But the service doesn't have a correct status:
+
+
+        kubectl describe pod simple-prod-collector-bf69cf755-n2ngq -n observability
+
+        because of the missing jaeger secret seen before:
+            Error: secret "jaeger-secret" not found
+        
+        kubectl get secret quickstart-es-elastic-user -o=jsonpath='{.data.elastic}' | base64 --decode > /es/certificates/ca.crt
+
+
+Additional topics:
+------------------
+Deploying the Kubernetes Dashboardlink in K3S
+    https://rancher.com/docs/k3s/latest/en/installation/kube-dashboard/
+
+    GITHUB_URL=https://github.com/kubernetes/dashboard/releases
+    VERSION_KUBE_DASHBOARD=$(curl -w '%{url_effective}' -I -L -s -S ${GITHUB_URL}/latest -o /dev/null | sed -e 's|.*/||')
+    sudo k3s kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/${VERSION_KUBE_DASHBOARD}/aio/deploy/recommended.yaml
+
+    kubectl apply -n observability -f other/jaeger-elasticsearch.yaml 
+
+    FOR DASHBOARDS IDEAS:
+    ----------------------
+    https://github.com/cloudworkz/kube-eagle

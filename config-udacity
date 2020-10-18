@@ -1,0 +1,31 @@
+apiVersion: v1
+clusters:
+- cluster:
+    insecure-skip-tls-verify: true
+    server: https://127.0.0.1:9999
+  name: default
+- cluster:
+    certificate-authority: /home/david/.minikube/ca.crt
+    server: https://192.168.99.100:8443
+  name: minikube
+contexts:
+- context:
+    cluster: default
+    user: vagrant
+  name: default
+- context:
+    cluster: minikube
+    user: minikube
+  name: minikube
+current-context: default
+kind: Config
+preferences: {}
+users:
+- name: vagrant
+  user:
+    client-certificate: /home/david/training/UDACITY/CNAND_nd064_Building_a_Metrics_Dashboard_Starter_Files/client-certificate
+    client-key: /home/david/training/UDACITY/CNAND_nd064_Building_a_Metrics_Dashboard_Starter_Files/client-key
+- name: minikube
+  user:
+    client-certificate: /home/david/.minikube/profiles/minikube/client.crt
+    client-key: /home/david/.minikube/profiles/minikube/client.key

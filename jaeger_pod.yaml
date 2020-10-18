@@ -1,0 +1,237 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: "2020-10-09T19:38:50Z"
+  generateName: jaeger-operator-7dc9bd7cf5-
+  labels:
+    name: jaeger-operator
+    pod-template-hash: 7dc9bd7cf5
+  managedFields:
+  - apiVersion: v1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:generateName: {}
+        f:labels:
+          .: {}
+          f:name: {}
+          f:pod-template-hash: {}
+        f:ownerReferences:
+          .: {}
+          k:{"uid":"01a5f13e-5b28-48a2-9084-03f1d76aede8"}:
+            .: {}
+            f:apiVersion: {}
+            f:blockOwnerDeletion: {}
+            f:controller: {}
+            f:kind: {}
+            f:name: {}
+            f:uid: {}
+      f:spec:
+        f:containers:
+          k:{"name":"jaeger-operator"}:
+            .: {}
+            f:args: {}
+            f:env:
+              .: {}
+              k:{"name":"OPERATOR_NAME"}:
+                .: {}
+                f:name: {}
+                f:value: {}
+              k:{"name":"POD_NAME"}:
+                .: {}
+                f:name: {}
+                f:valueFrom:
+                  .: {}
+                  f:fieldRef:
+                    .: {}
+                    f:apiVersion: {}
+                    f:fieldPath: {}
+              k:{"name":"POD_NAMESPACE"}:
+                .: {}
+                f:name: {}
+                f:valueFrom:
+                  .: {}
+                  f:fieldRef:
+                    .: {}
+                    f:apiVersion: {}
+                    f:fieldPath: {}
+              k:{"name":"WATCH_NAMESPACE"}:
+                .: {}
+                f:name: {}
+                f:valueFrom:
+                  .: {}
+                  f:fieldRef:
+                    .: {}
+                    f:apiVersion: {}
+                    f:fieldPath: {}
+            f:image: {}
+            f:imagePullPolicy: {}
+            f:name: {}
+            f:ports:
+              .: {}
+              k:{"containerPort":8383,"protocol":"TCP"}:
+                .: {}
+                f:containerPort: {}
+                f:name: {}
+                f:protocol: {}
+              k:{"containerPort":8686,"protocol":"TCP"}:
+                .: {}
+                f:containerPort: {}
+                f:name: {}
+                f:protocol: {}
+            f:resources: {}
+            f:terminationMessagePath: {}
+            f:terminationMessagePolicy: {}
+        f:dnsPolicy: {}
+        f:enableServiceLinks: {}
+        f:restartPolicy: {}
+        f:schedulerName: {}
+        f:securityContext: {}
+        f:serviceAccount: {}
+        f:serviceAccountName: {}
+        f:terminationGracePeriodSeconds: {}
+      f:status:
+        f:conditions:
+          k:{"type":"ContainersReady"}:
+            .: {}
+            f:lastProbeTime: {}
+            f:lastTransitionTime: {}
+            f:status: {}
+            f:type: {}
+          k:{"type":"Initialized"}:
+            .: {}
+            f:lastProbeTime: {}
+            f:lastTransitionTime: {}
+            f:status: {}
+            f:type: {}
+          k:{"type":"Ready"}:
+            .: {}
+            f:lastProbeTime: {}
+            f:lastTransitionTime: {}
+            f:status: {}
+            f:type: {}
+        f:containerStatuses: {}
+        f:hostIP: {}
+        f:phase: {}
+        f:podIP: {}
+        f:podIPs:
+          .: {}
+          k:{"ip":"10.42.0.89"}:
+            .: {}
+            f:ip: {}
+        f:startTime: {}
+    manager: k3s
+    operation: Update
+    time: "2020-10-12T15:16:30Z"
+  name: jaeger-operator-7dc9bd7cf5-p6wh9
+  namespace: observability
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ReplicaSet
+    name: jaeger-operator-7dc9bd7cf5
+    uid: 01a5f13e-5b28-48a2-9084-03f1d76aede8
+  resourceVersion: "82585"
+  selfLink: /api/v1/namespaces/observability/pods/jaeger-operator-7dc9bd7cf5-p6wh9
+  uid: 66230fce-b4a0-4274-9882-0642413706f1
+spec:
+  containers:
+  - args:
+    - start
+    env:
+    - name: WATCH_NAMESPACE
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.namespace
+    - name: POD_NAME
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.name
+    - name: POD_NAMESPACE
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.namespace
+    - name: OPERATOR_NAME
+      value: jaeger-operator
+    image: jaegertracing/jaeger-operator:1.20.0
+    imagePullPolicy: Always
+    name: jaeger-operator
+    ports:
+    - containerPort: 8383
+      name: http-metrics
+      protocol: TCP
+    - containerPort: 8686
+      name: cr-metrics
+      protocol: TCP
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: jaeger-operator-token-lvgnj
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  nodeName: localhost
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: jaeger-operator
+  serviceAccountName: jaeger-operator
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - name: jaeger-operator-token-lvgnj
+    secret:
+      defaultMode: 420
+      secretName: jaeger-operator-token-lvgnj
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2020-10-09T19:38:51Z"
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2020-10-12T15:16:29Z"
+    status: "True"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2020-10-12T15:16:29Z"
+    status: "True"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2020-10-09T19:38:50Z"
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: containerd://9c3cdd03c3170e641494197f0ac1957ad6262ce5b1aa485aece08782b66ccd5b
+    image: docker.io/jaegertracing/jaeger-operator:1.20.0
+    imageID: docker.io/jaegertracing/jaeger-operator@sha256:2d2c9a325a2e40400821e92de0abe826f86174208ae7d3357eba7fb692139c98
+    lastState: {}
+    name: jaeger-operator
+    ready: true
+    restartCount: 5
+    started: true
+    state:
+      running:
+        startedAt: "2020-10-12T15:16:26Z"
+  hostIP: 10.0.2.15
+  phase: Running
+  podIP: 10.42.0.89
+  podIPs:
+  - ip: 10.42.0.89
+  qosClass: BestEffort
+  startTime: "2020-10-09T19:38:51Z"
